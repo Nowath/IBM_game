@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { computeBoard, CellType } from '@/lib/boardCompute';
+import { NumberInput } from '@heroui/react';
 
 interface Props {
   onRoomCreated: (roomId: string) => void;
@@ -130,12 +131,12 @@ export default function AdminPanel({ onRoomCreated }: Props) {
         <div className="grid grid-cols-3 gap-3">
           {(['s', 'p', 'q'] as const).map(k => (
             <div key={k}>
-              <label className="text-sm text-gray-400 mb-1 block">พารามิเตอร์ {k}</label>
-              <input
-                type="number" min={2} max={97}
-                className="w-full bg-gray-700 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-teal-400"
+              <NumberInput
+                label={`พารามิเตอร์ ${k}`}
+                inputMode="numeric"
+                min={0}
                 value={params[k]}
-                onChange={e => setParams(prev => ({ ...prev, [k]: Number(e.target.value) }))}
+                onValueChange={val => setParams(prev => ({ ...prev, [k]: val ?? 0 }))}
               />
             </div>
           ))}
@@ -197,7 +198,12 @@ export default function AdminPanel({ onRoomCreated }: Props) {
             {/* QR Code */}
             {joinUrl && (
               <div className="bg-white rounded-2xl p-5 flex flex-col items-center gap-3">
-                <QRCodeSVG value={joinUrl} size={400} />
+                <div className=' hidden md:flex'>
+                    <QRCodeSVG value={joinUrl} size={400} />
+                </div>
+                <div className=' flex md:hidden'>
+                    <QRCodeSVG value={joinUrl} size={200} />
+                </div>
                 <p className="text-gray-700 text-xs text-center">
                   สแกนเพื่อเข้าร่วมห้อง <span className="font-mono font-bold">{createdId}</span>
                 </p>
