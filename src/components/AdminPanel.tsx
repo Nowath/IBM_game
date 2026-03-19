@@ -132,21 +132,12 @@ export default function AdminPanel({ onRoomCreated }: Props) {
         <div className="grid grid-cols-3 gap-3">
           {(['s', 'p', 'q'] as const).map(k => (
             <div key={k}>
-<<<<<<< HEAD
               <label className="text-sm text-gray-400 mb-1 block">พารามิเตอร์ {k}</label>
               <input
                 type="number" min={2} max={97}
                 className="w-full bg-gray-700 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-teal-400"
                 value={draftSPQ[k]}
                 onChange={e => setDraftSPQ(prev => ({ ...prev, [k]: Number(e.target.value) }))}
-=======
-              <NumberInput
-                label={`พารามิเตอร์ ${k}`}
-                inputMode="numeric"
-                min={0}
-                value={params[k]}
-                onValueChange={val => setParams(prev => ({ ...prev, [k]: val ?? 0 }))}
->>>>>>> 15dd990d26a781c4dd89d3978841e38285a8363c
               />
             </div>
           ))}
