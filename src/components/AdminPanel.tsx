@@ -28,7 +28,8 @@ interface RoomSnap {
 
 export default function AdminPanel({ onRoomCreated }: Props) {
   const [roomName, setRoomName] = useState('');
-  const [params, setParams] = useState({ s: 5, p: 2, q: 2, N: 5, M: 5 });
+  const [params, setParams] = useState({ s: 5, p: 2, q: 2, N: 10, M: 10 });
+  const [draftSPQ, setDraftSPQ] = useState({ s: 5, p: 2, q: 2 });
   const [preview, setPreview] = useState<CellType[][]>([]);
   const [createdId, setCreatedId] = useState('');
   const [copied, setCopied] = useState(false);
@@ -117,7 +118,7 @@ export default function AdminPanel({ onRoomCreated }: Props) {
             {PRESETS.map(pr => (
               <button
                 key={pr.label}
-                onClick={() => setParams(p => ({ ...p, s: pr.s, p: pr.p, q: pr.q }))}
+                onClick={() => { setDraftSPQ({ s: pr.s, p: pr.p, q: pr.q }); setParams(p => ({ ...p, s: pr.s, p: pr.p, q: pr.q })); }}
                 className="px-3 py-1 rounded-lg bg-gray-700 hover:bg-teal-600 text-sm transition-colors"
               >
                 {pr.label}
@@ -134,12 +135,18 @@ export default function AdminPanel({ onRoomCreated }: Props) {
               <input
                 type="number" min={2} max={97}
                 className="w-full bg-gray-700 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-teal-400"
-                value={params[k]}
-                onChange={e => setParams(prev => ({ ...prev, [k]: Number(e.target.value) }))}
+                value={draftSPQ[k]}
+                onChange={e => setDraftSPQ(prev => ({ ...prev, [k]: Number(e.target.value) }))}
               />
             </div>
           ))}
         </div>
+        <button
+          onClick={() => setParams(prev => ({ ...prev, ...draftSPQ }))}
+          className="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-xl transition-colors text-sm"
+        >
+          ✓ Apply Parameters
+        </button>
 
         {/* Board Preview (admin only — shows A/B/X) */}
         <div>

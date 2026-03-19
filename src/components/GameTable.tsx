@@ -234,7 +234,7 @@ export default function GameTable({ roomId, tableId, playerName, role }: Props) 
       <div className="flex-1 flex items-center justify-center p-4">
         <div
           className="grid gap-1.5"
-          style={{ gridTemplateColumns: `repeat(${M}, minmax(3rem, 4.5rem))` }}
+          style={{ gridTemplateColumns: `repeat(${M}, minmax(2rem, 4.5rem))` }}
         >
           {gs.board.map((row, i) =>
             row.map((_, j) => (
