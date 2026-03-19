@@ -93,9 +93,10 @@ export default function GameTable({ roomId, tableId, playerName, role }: Props) 
   async function handleCellClick(row: number, col: number) {
     if (!tableData) return;
     const gs = tableData.gameState;
-    if (gs.winner || gs.currentTurn !== role) return;
+    const effectiveRole: 'alice' | 'bob' = tableData.players[0] === playerName ? 'alice' : 'bob';
+    if (gs.winner || gs.currentTurn !== effectiveRole) return;
 
-    if (gs.phase === 'placement' && role === 'alice') {
+    if (gs.phase === 'placement' && effectiveRole === 'alice') {
       if (gs.removedCells[row][col]) return;
       const res = await fetch('/api/game', {
         method: 'POST',
@@ -138,16 +139,17 @@ export default function GameTable({ roomId, tableId, playerName, role }: Props) 
   const gs = tableData.gameState;
   const N = gs.board.length;
   const M = gs.board[0]?.length ?? 0;
-  const info = ROLE_INFO[role];
+  const effectiveRole: 'alice' | 'bob' = tableData.players[0] === playerName ? 'alice' : 'bob';
+  const info = ROLE_INFO[effectiveRole];
 
   function isValidMove(row: number, col: number): boolean {
-    if (!gs.pawnPos || gs.phase !== 'moving' || gs.currentTurn !== role) return false;
+    if (!gs.pawnPos || gs.phase !== 'moving' || gs.currentTurn !== effectiveRole) return false;
     const [pr, pc] = gs.pawnPos;
     return Math.abs(row - pr) + Math.abs(col - pc) === 1 && !gs.removedCells[row][col];
   }
 
   function isValidPlacement(row: number, col: number): boolean {
-    return gs.phase === 'placement' && role === 'alice' && !gs.removedCells[row][col];
+    return gs.phase === 'placement' && effectiveRole === 'alice' && !gs.removedCells[row][col];
   }
 
   function cellStyle(row: number, col: number): string {
@@ -212,22 +214,22 @@ export default function GameTable({ roomId, tableId, playerName, role }: Props) 
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700">
-        <PlayerChip name={tableData.players[0]} label="ALICE" color="teal" active={gs.currentTurn === 'alice' && gs.phase === 'moving'} isMe={role === 'alice'} />
+        <PlayerChip name={tableData.players[0]} label="ALICE" color="teal" active={gs.currentTurn === 'alice' && gs.phase === 'moving'} isMe={effectiveRole === 'alice'} />
 
         <div className="flex flex-col items-center gap-1">
           <div className="text-xs text-gray-400 text-center">
             {gs.phase === 'placement'
-              ? (role === 'alice' ? '⚡ เลือกช่องวางหมาก' : '👁️ รอ Alice วางหมาก')
+              ? (effectiveRole === 'alice' ? '⚡ เลือกช่องวางหมาก' : '👁️ รอ Alice วางหมาก')
               : gs.winner
-              ? (gs.winner === role ? '🏆 คุณชนะ!' : '😢 คุณแพ้')
-              : gs.currentTurn === role ? '⚡ ตาคุณ!' : `รอ ${gs.currentTurn === 'alice' ? tableData.players[0] : tableData.players[1]}`}
+              ? (gs.winner === effectiveRole ? '🏆 คุณชนะ!' : '😢 คุณแพ้')
+              : gs.currentTurn === effectiveRole ? '⚡ ตาคุณ!' : `รอ ${gs.currentTurn === 'alice' ? tableData.players[0] : tableData.players[1]}`}
           </div>
           {gs.phase === 'moving' && !gs.winner && (
             <TimerCircle timeLeft={timeLeft} total={TURN_SECONDS} colorClass={timerColor} />
           )}
         </div>
 
-        <PlayerChip name={tableData.players[1]} label="BOB" color="amber" active={gs.currentTurn === 'bob' && gs.phase === 'moving'} isMe={role === 'bob'} />
+        <PlayerChip name={tableData.players[1]} label="BOB" color="amber" active={gs.currentTurn === 'bob' && gs.phase === 'moving'} isMe={effectiveRole === 'bob'} />
       </div>
 
       {/* Board */}
@@ -269,9 +271,9 @@ export default function GameTable({ roomId, tableId, playerName, role }: Props) 
       {showWinModal && gs.winner && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 rounded-2xl p-8 max-w-sm w-full flex flex-col items-center gap-5 text-center shadow-2xl">
-            <div className="text-5xl">{gs.winner === role ? '🏆' : '😢'}</div>
+            <div className="text-5xl">{gs.winner === effectiveRole ? '🏆' : '😢'}</div>
             <div>
-              <h2 className="text-2xl font-bold mb-1">{gs.winner === role ? 'คุณชนะ!' : 'คุณแพ้!'}</h2>
+              <h2 className="text-2xl font-bold mb-1">{gs.winner === effectiveRole ? 'คุณชนะ!' : 'คุณแพ้!'}</h2>
               <p className="text-gray-400 text-sm">
                 {gs.winner === 'alice' ? tableData.players[0] : tableData.players[1]} ชนะในรอบนี้
               </p>
